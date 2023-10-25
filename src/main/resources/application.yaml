@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: @project.artifactId@
+
+  datasource:
+    continue-on-error: true
+    url: jdbc:postgresql://localhost:5432/rest_api_user_crud
+    platform: postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/master.yaml
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
