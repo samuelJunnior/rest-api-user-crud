@@ -1,5 +1,7 @@
 server:
   port: 8080
+  error:
+    include-stacktrace: ON_PARAM
 
 spring:
   application:
@@ -13,9 +15,29 @@ spring:
     password: postgres
     driver-class-name: org.postgresql.Driver
 
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+
   liquibase:
     enabled: true
-    change-log: classpath:db/changelog/master.yaml
+    change-log: classpath:db/changelog/master.xml
     url: ${spring.datasource.url}
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
+
+logging:
+  level:
+    root: info
+    br: debug
+
+integrations:
+  viacep:
+    base-url: viacep.com.br
