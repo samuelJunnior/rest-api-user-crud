@@ -1,5 +1,6 @@
 package br.com.samueljunnior.module.user.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -28,10 +29,14 @@ public class UserCreateDTO implements Serializable {
     private LocalDate birthDate;
 
     @NotEmpty(message = "{field.required-field}")
-    @CPF(message = "{field.cpf-invalido}")
-    @Size(min = 11, max = 11, message = "{field.tamanho-invalido}")
+    @CPF(message = "{field.invalid-cpf}")
+    @Size(min = 11, max = 11, message = "{field.invalid-size}")
     private String cpf;
 
-    @Size(min = 8, max = 10, message = "{field.tamanho-invalido}")
+    @NotEmpty(message = "{field.required-field}")
+    @Email(message = "field.invalid-email" )
+    private String email;
+
+    @Size(min = 8, max = 10, message = "{field.invalid-sizer}")
     private String cep;
 }

@@ -33,6 +33,17 @@ spring:
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
 
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail:
+        smtp:
+          debug: true
+          starttls:
+            enable: true
+    test-connection: false
+
 logging:
   level:
     root: info
@@ -41,3 +52,7 @@ logging:
 integrations:
   viacep:
     base-url: viacep.com.br
+
+email:
+  sender: no-replay@devsj.com.br
+  subject: E-mail padrão.

@@ -29,6 +29,9 @@ public class UserEntity {
     @Column(name = "CPF")
     private String cpf;
 
+    @Column(name = "EMAIL")
+    private String email;
+
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = AddressEntity.ID_ADDRESS)
     private AddressEntity address;

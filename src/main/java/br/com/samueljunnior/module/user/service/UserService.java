@@ -1,7 +1,10 @@
-package br.com.samueljunnior.module.user.servie;
+package br.com.samueljunnior.module.user.service;
 
 import br.com.samueljunnior.client.service.ViaCepService;
 import br.com.samueljunnior.core.message.MessagePropertiesEnum;
+import br.com.samueljunnior.module.email.dto.EmailDTO;
+import br.com.samueljunnior.module.email.enums.EmailType;
+import br.com.samueljunnior.module.email.service.EmailService;
 import br.com.samueljunnior.module.user.dto.UserCreateDTO;
 import br.com.samueljunnior.module.user.dto.UserDTO;
 import br.com.samueljunnior.module.user.entity.AddressEntity;
@@ -12,9 +15,11 @@ import br.com.samueljunnior.module.user.mapper.UserMapper;
 import br.com.samueljunnior.module.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +29,13 @@ public class UserService {
     private final UserMapper mapper;
     private final UserCreateMapper userCreateMapper;
     private final ViaCepService viaCepService;
+    private final EmailService emailService;
+
+    @Value("${email.sender}")
+    private String sender;
+
+    @Value("${email.subject}")
+    private String subject;
 
     public List<UserDTO> findAll() {
         return mapper.toDto(repository.findAll());
@@ -51,10 +63,22 @@ public class UserService {
                 .ufEnum(UFEnum.valueOf(cep.getUf()))
                 .build();
 
-        final var ent = userCreateMapper.toEntity(dto);
+        var ent = userCreateMapper.toEntity(dto);
         ent.setAddress(address);
 
-        return mapper.toDto(repository.save(ent));
+        ent = repository.save(ent);
+
+        emailService.sendEmailsHtml(List.of(
+                EmailDTO.builder()
+                        .resourceTemplate(EmailType.EMAIL_WELCOME.getResource())
+                        .email(ent.getEmail())
+                        .sender(sender)
+                        .subject(subject)
+                        .paramReplaced(Map.of("(Name)", ent.getName()))
+                        .build()
+        ));
+
+        return mapper.toDto(ent);
     }
 
     public void updateUser(Long id, UserDTO dto){
@@ -83,6 +107,20 @@ public class UserService {
     public void deleteUser(Long id){
         final var user = this.findUserEntity(id);
         repository.delete(user);
+    }
+
+    public void resendEmailSubscription(Long idUser){
+        final var user = this.findUserEntity(idUser);
+
+        emailService.sendEmailsHtml(List.of(
+                EmailDTO.builder()
+                        .resourceTemplate(EmailType.EMAIL_WELCOME.getResource())
+                        .email(user.getEmail())
+                        .sender(sender)
+                        .subject(subject)
+                        .paramReplaced(Map.of("(Name)", user.getName()))
+                        .build()
+        ));
     }
 
 }
