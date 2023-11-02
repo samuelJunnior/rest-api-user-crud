@@ -22,4 +22,5 @@ public class UserDTO implements Serializable {
     private LocalDate birthDate;
     private String cpf;
     private AddressDTO address;
+    private String email;
 }
