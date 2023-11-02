@@ -2,7 +2,7 @@ package br.com.samueljunnior.module.user.controller.v1;
 
 import br.com.samueljunnior.module.user.dto.UserCreateDTO;
 import br.com.samueljunnior.module.user.dto.UserDTO;
-import br.com.samueljunnior.module.user.servie.UserService;
+import br.com.samueljunnior.module.user.service.UserService;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -145,5 +145,19 @@ public class UserController {
         service.deleteUser(id);
     }
 
+    @PostMapping("/{id}/resend-email-subscription")
+    @Operation(
+            summary = "Reenvia o e-mail de inscrição.",
+            description = "Reenvia o e-mail de inscrição para o usuário.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200"
+                    )
+            }
+    )
+    public ResponseEntity<Void> resendEmailSubscription(@PathVariable(name = "id") Long id) {
+        service.resendEmailSubscription(id);
+        return ResponseEntity.ok().build();
+    }
 
 }

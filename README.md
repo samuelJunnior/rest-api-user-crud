@@ -27,7 +27,7 @@
 * Produtividade com `Lombook` e `MapStruct`.
 * Integrações com APIs externas com `Spring Cloud OpenFeing`.
 * Documentação com `OpenApi/Swagger`.
-* Envio de e-mail com `Spring Boot Starter Mail`
+* Envio de e-mail de forma assincrona com `@Async` e com `Spring Boot Starter Mail`
 
 ## 💻 Pré-requisitos
 
