@@ -1,7 +1,9 @@
 package br.com.samueljunnior.module.user.controller.v1;
 
+import br.com.samueljunnior.core.pagination.PageableReponser;
 import br.com.samueljunnior.module.user.dto.UserCreateDTO;
 import br.com.samueljunnior.module.user.dto.UserDTO;
+import br.com.samueljunnior.module.user.dto.UserFilter;
 import br.com.samueljunnior.module.user.service.UserService;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +16,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -35,6 +39,39 @@ import java.util.List;
 public class UserController {
 
     private final UserService service;
+
+    @GetMapping("/filter")
+    @Operation(
+            summary = "Busca os usuários pelo filtro.",
+            description = "Busca todos os usuários cadastrados conforme o filtro informado de forma paginado.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = {@Content(schema = @Schema(implementation = UserDTO.class))}
+                    )
+            }
+    )
+//    Caso deseje alterar para no Swagger ficar por RequestParam.
+//    @Parameters({
+//        @Parameter(name = "name", description = "Filtro por nome", in = ParameterIn.QUERY, schema = @Schema(type = "string")),
+//        @Parameter(name = "cpf", description = "Filtro por CPF", in = ParameterIn.QUERY, schema = @Schema(type = "string")),
+//        @Parameter(name = "email", description = "Filtro por e-mail", in = ParameterIn.QUERY, schema = @Schema(type = "string")),
+//        @Parameter(name = "filter", hidden = true)
+//    })
+    public ResponseEntity<PageableReponser<UserDTO>> findUserByFilter(
+        @RequestParam(defaultValue = "0") Integer pageIndex,
+        @RequestParam(defaultValue = "10") Integer pageSize,
+        @RequestParam(defaultValue = "name") String sortField,
+        @RequestParam(defaultValue = "ASC") Sort.Direction sortType,
+        UserFilter filter
+    ) {
+        final var paging = PageRequest.of(
+                pageIndex,
+                pageSize,
+                Sort.by(sortType, sortField)
+        );
+        return ResponseEntity.ok(service.findUserByFilter(paging, filter));
+    }
 
     @GetMapping
     @Operation(
@@ -127,7 +164,7 @@ public class UserController {
     public void updateAddress(
             @PathVariable(name = "id") Long id,
             @RequestParam(defaultValue = "0") String cep
-    ){
+    ) {
         ResponseEntity.ok(service.updateAddresByCep(id, cep));
     }
 
@@ -141,7 +178,7 @@ public class UserController {
                     )
             }
     )
-    public void deleteUser(@PathVariable(name = "id") Long id){
+    public void deleteUser(@PathVariable(name = "id") Long id) {
         service.deleteUser(id);
     }
 
