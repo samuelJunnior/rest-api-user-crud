@@ -4,14 +4,17 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "TB_USUARIO")
-public class UserEntity {
-    private static final long serialVersionUID = 492775980543211690L;
+public class UserEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -5724813754214294683L;
 
     public static final String ID_USUARIO = "ID_USUARIO";
 

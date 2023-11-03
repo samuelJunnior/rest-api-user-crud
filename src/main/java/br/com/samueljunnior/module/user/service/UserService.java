@@ -2,20 +2,27 @@ package br.com.samueljunnior.module.user.service;
 
 import br.com.samueljunnior.client.service.ViaCepService;
 import br.com.samueljunnior.core.message.MessagePropertiesEnum;
+import br.com.samueljunnior.core.pagination.PageableConverter;
+import br.com.samueljunnior.core.pagination.PageableReponser;
 import br.com.samueljunnior.module.email.dto.EmailDTO;
 import br.com.samueljunnior.module.email.enums.EmailType;
 import br.com.samueljunnior.module.email.service.EmailService;
 import br.com.samueljunnior.module.user.dto.UserCreateDTO;
 import br.com.samueljunnior.module.user.dto.UserDTO;
+import br.com.samueljunnior.module.user.dto.UserFilter;
 import br.com.samueljunnior.module.user.entity.AddressEntity;
 import br.com.samueljunnior.module.user.entity.UserEntity;
 import br.com.samueljunnior.module.user.enums.UFEnum;
 import br.com.samueljunnior.module.user.mapper.UserCreateMapper;
+import br.com.samueljunnior.module.user.mapper.UserFilterMapper;
 import br.com.samueljunnior.module.user.mapper.UserMapper;
 import br.com.samueljunnior.module.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,12 +37,28 @@ public class UserService {
     private final UserCreateMapper userCreateMapper;
     private final ViaCepService viaCepService;
     private final EmailService emailService;
+    private final UserFilterMapper userFilterMapper;
 
     @Value("${email.sender}")
     private String sender;
 
     @Value("${email.subject}")
     private String subject;
+
+    public PageableReponser<UserDTO> findUserByFilter(PageRequest paging, UserFilter filter){
+        final var filterEnt = userFilterMapper.toEntity(filter);
+        final var exm = ExampleMatcher
+                .matchingAny()
+                .withIgnoreNullValues()
+                .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.ignoreCase().contains())
+                .withMatcher("birthDate", ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher("cpf", ExampleMatcher.GenericPropertyMatchers.contains())
+                .withMatcher("email", ExampleMatcher.GenericPropertyMatchers.contains());
+
+        final var ex = Example.of(filterEnt, exm);
+        final var page = repository.findAll(ex, paging);
+        return PageableConverter.toPageResponse(page.getTotalElements(), page.getTotalPages(), mapper.toDto(page.getContent()));
+    }
 
     public List<UserDTO> findAll() {
         return mapper.toDto(repository.findAll());
