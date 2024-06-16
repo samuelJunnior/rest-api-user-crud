@@ -11,7 +11,9 @@ public enum MessagePropertiesEnum implements IMessageProperties {
     API_NOT_FOUND("api.not-found"),
     API_UNIDENTIFIED_ERROR("api.unidentified-error"),
     VIA_CEP_INTEGRATIONS_ERROR("via-cep.integration_error"),
-    ALREADY_REGISTERED_USER("already_registred_user");
+    ALREADY_REGISTERED_USER("already_registred_user"),
+    REPORT_IMAGE_ERROR("report_image_error"),
+    USER_REPORT_ERROR("user_report_error");
 
     private final String key;
     private String[] args = new String[0];

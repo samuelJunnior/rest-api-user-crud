@@ -7,6 +7,7 @@ import br.com.samueljunnior.core.pagination.PageableReponser;
 import br.com.samueljunnior.module.email.dto.EmailDTO;
 import br.com.samueljunnior.module.email.enums.EmailType;
 import br.com.samueljunnior.module.email.service.EmailService;
+import br.com.samueljunnior.module.report.service.ReportService;
 import br.com.samueljunnior.module.user.dto.UserCreateDTO;
 import br.com.samueljunnior.module.user.dto.UserDTO;
 import br.com.samueljunnior.module.user.dto.UserFilter;
@@ -38,6 +39,7 @@ public class UserService {
     private final ViaCepService viaCepService;
     private final EmailService emailService;
     private final UserFilterMapper userFilterMapper;
+    private final ReportService reportService;
 
     @Value("${email.sender}")
     private String sender;
@@ -144,6 +146,13 @@ public class UserService {
                         .paramReplaced(Map.of("(Name)", user.getName()))
                         .build()
         ));
+    }
+
+    public byte[] generateUserReport(Long idUser){
+        final var user = repository.findById(idUser)
+                .orElseThrow(MessagePropertiesEnum.API_NOT_FOUND::businessException);
+
+        return reportService.generateUserReport(mapper.toDto(user));
     }
 
 }
