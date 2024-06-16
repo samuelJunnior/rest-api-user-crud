@@ -30,6 +30,7 @@
 * Envio de e-mail de forma assincrona com `@Async` e com `Spring Boot Starter Mail`
 * Pesquisa por filtro utilizando API do Spring Data `QueryByExemple`.
 * `Paginação e Ordenação` utilizando API do Spring Data.
+* Geração de relatório PDF utilizando JasperReport.
 
 ## 💻 Pré-requisitos
 

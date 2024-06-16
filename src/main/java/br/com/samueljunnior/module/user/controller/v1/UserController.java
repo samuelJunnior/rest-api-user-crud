@@ -1,6 +1,7 @@
 package br.com.samueljunnior.module.user.controller.v1;
 
 import br.com.samueljunnior.core.pagination.PageableReponser;
+import br.com.samueljunnior.module.report.util.ReportTemplateValues;
 import br.com.samueljunnior.module.user.dto.UserCreateDTO;
 import br.com.samueljunnior.module.user.dto.UserDTO;
 import br.com.samueljunnior.module.user.dto.UserFilter;
@@ -16,12 +17,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.List;
 
@@ -197,4 +201,24 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{id}/report")
+    @Operation(
+            summary = "Gera relatório com dados do candidato..",
+            description = "Gera relatório PDF com dados do candidato.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = {@Content(schema = @Schema(implementation = byte[].class))}
+                    )
+            }
+    )
+    public ResponseEntity<InputStreamResource> generateUserReport(@PathVariable(name = "id") Long idUser) {
+        final var report = service.generateUserReport(idUser);
+        return ResponseEntity
+                .ok()
+                .headers(ReportTemplateValues.getHttpHeadersForPDFReport("userReport.pdf"))
+                .contentLength(report.length)
+                .contentType(MediaType.parseMediaType(MediaType.APPLICATION_PDF_VALUE))
+                .body(new InputStreamResource(new ByteArrayInputStream(report)));
+    }
 }
